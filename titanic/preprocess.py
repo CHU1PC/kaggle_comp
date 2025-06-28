@@ -24,10 +24,7 @@ def preprocess():
     train_data["Sex"] = train_data["Sex"].replace({"male": 0, "female": 1})
     test_data["Sex"] = test_data["Sex"].replace({"male": 0, "female": 1})
 
-    # スケーリング（例：標準化）
-    from sklearn.preprocessing import StandardScaler
-    scaler = StandardScaler()
-    train_data[FEATURES] = scaler.fit_transform(train_data[FEATURES])
-    test_data[FEATURES] = scaler.transform(test_data[FEATURES])
+    train_data = train_data.astype(float)
+    test_data = test_data.astype(float)
 
     return train_data, test_data
