@@ -5,15 +5,14 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 
 from preprocess import preprocess
-from config import DATA_DIR
+from config import DATA_DIR, FEATURES
 from model import Logistic
 
 
 def train(device, batch_size=16, n_epoch=20, lr=0.001):
     train_data, test_data = preprocess()
 
-    features = ["Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"]
-    x_train = torch.tensor(train_data[features].values, dtype=torch.float32)
+    x_train = torch.tensor(train_data[FEATURES].values, dtype=torch.float32)
 
     y_train = torch.tensor(train_data["Survived"].values,
                            dtype=torch.float32).reshape(-1, 1)
@@ -51,8 +50,7 @@ def train(device, batch_size=16, n_epoch=20, lr=0.001):
 def predict(model, device):
     _, test_data = preprocess()
 
-    features = ["Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"]
-    x_test = torch.tensor(test_data[features].values,
+    x_test = torch.tensor(test_data[FEATURES].values,
                           dtype=torch.float32).to(device)
 
     model.load_state_dict(torch.load(os.path.join(DATA_DIR, "logistic.pth"),

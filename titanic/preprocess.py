@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-from config import DATA_DIR
+from config import DATA_DIR, FEATURES
 
 pd.set_option('future.no_silent_downcasting', True)
 
@@ -12,10 +12,8 @@ def preprocess():
     train_data = pd.read_csv(os.path.join(DATA_DIR, "train.csv"))
     test_data = pd.read_csv(os.path.join(DATA_DIR, "test.csv"))
 
-    # 使う特徴量を拡張
-    features = ["Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"]
-    train_data = train_data[["Survived"] + features]
-    test_data = test_data[["PassengerId"] + features]
+    train_data = train_data[["Survived"] + FEATURES]
+    test_data = test_data[["PassengerId"] + FEATURES]
 
     # 欠損値補完
     for col in ["Age", "Fare"]:
@@ -29,7 +27,7 @@ def preprocess():
     # スケーリング（例：標準化）
     from sklearn.preprocessing import StandardScaler
     scaler = StandardScaler()
-    train_data[features] = scaler.fit_transform(train_data[features])
-    test_data[features] = scaler.transform(test_data[features])
+    train_data[FEATURES] = scaler.fit_transform(train_data[FEATURES])
+    test_data[FEATURES] = scaler.transform(test_data[FEATURES])
 
     return train_data, test_data
