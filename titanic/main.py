@@ -8,10 +8,12 @@ from model import Logistic
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-def main():
+def main(train_data=True):
     features = ["Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"]
     model_path = os.path.join(DATA_DIR, "logistic.pth")
-    if not os.path.exists(model_path):
+    if train_data:
+        if os.path.exists(model_path):
+            os.remove(model_path)
         train(batch_size=16, n_epoch=100, lr=0.001, device=device)
 
     model = Logistic(n_in=len(features), n_out=1).to(device)
