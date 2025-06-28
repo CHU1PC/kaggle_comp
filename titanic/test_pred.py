@@ -10,7 +10,7 @@ from model import Logistic
 
 
 def train(device, batch_size=16, n_epoch=20, lr=0.001):
-    train_data, test_data = preprocess()
+    train_data, _ = preprocess()
 
     x_train = torch.tensor(train_data[FEATURES].values, dtype=torch.float32)
 
@@ -29,7 +29,7 @@ def train(device, batch_size=16, n_epoch=20, lr=0.001):
     model = Logistic(n_in=x_train.shape[1], n_out=1).to(device)
 
     criterion = nn.BCEWithLogitsLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
     num_epochs = n_epoch
     model.train()
