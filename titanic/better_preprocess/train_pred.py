@@ -10,7 +10,7 @@ from model import MLP
 
 
 def train(device, batch_size=16, n_epoch=20, lr=0.001):
-    train_data, _ = preprocess()
+    train_data, _ = preprocess(device)
 
     x_train = torch.tensor(train_data.drop("Survived", axis=1).values,
                            dtype=torch.float32)
@@ -52,7 +52,7 @@ def train(device, batch_size=16, n_epoch=20, lr=0.001):
 
 
 def predict(model, device):
-    _, test_data = preprocess()
+    _, test_data = preprocess(device)
 
     x_test = torch.tensor(test_data[FEATURES].values,
                           dtype=torch.float32).to(device)
