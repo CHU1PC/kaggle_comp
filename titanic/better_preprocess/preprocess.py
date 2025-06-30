@@ -76,11 +76,3 @@ def preprocess(device, features=FEATURES):
                                     r"^G.*": 6, r"^T.*": -1}, regex=True)
 
     return train_data, test_data
-
-
-# import torch
-# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-# train, test = preprocess(device)
-
-# print(train.info())
-# print(train["Name"][train["Honorifics"].isna()])
