@@ -9,7 +9,7 @@ train, _ = preprocess()
 
 hono_survive = train.groupby("Honorifics")["Survived"].mean()
 
-plt.bar(hono_survive.index, hono_survive.values)
+plt.bar(hono_survive.index, hono_survive.to_numpy())
 plt.xlabel("honorifics")
 plt.ylabel("Survived rate")
 plt.title("Survival Rate by honorifics")
