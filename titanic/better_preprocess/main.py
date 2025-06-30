@@ -13,7 +13,7 @@ def main(train_data=True):
     if train_data:
         if os.path.exists(model_path):
             os.remove(model_path)
-        train(batch_size=32, n_epoch=300, lr=0.001, device=device)
+        train(batch_size=16, n_epoch=300, lr=0.001, device=device)
 
     model = MLP(n_in=len(FEATURES), n_out=1).to(device)
     predict(model, device)
