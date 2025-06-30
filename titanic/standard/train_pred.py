@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader, TensorDataset
 
 from preprocess import preprocess
 from config import DATA_DIR, FEATURES
-from model import Logistic
+from model import MLP
 
 
 def train(device, batch_size=16, n_epoch=20, lr=0.001):
@@ -27,7 +27,7 @@ def train(device, batch_size=16, n_epoch=20, lr=0.001):
         x_dataset, batch_size, shuffle=True
     )
 
-    model = Logistic(n_in=x_train.shape[1], n_out=1).to(device)
+    model = MLP(n_in=x_train.shape[1], n_out=1).to(device)
 
     criterion = nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
@@ -48,7 +48,7 @@ def train(device, batch_size=16, n_epoch=20, lr=0.001):
             print(f"Epoch {epoch+1}, Loss: {loss.item():.4f},"
                   f"Accuracy: {acc:.4f}")
 
-    torch.save(model.state_dict(), os.path.join(DATA_DIR, "logistic.pth"))
+    torch.save(model.state_dict(), os.path.join(DATA_DIR, "mlp.pth"))
 
 
 def predict(model, device):
@@ -57,7 +57,7 @@ def predict(model, device):
     x_test = torch.tensor(test_data[FEATURES].values,
                           dtype=torch.float32).to(device)
 
-    model.load_state_dict(torch.load(os.path.join(DATA_DIR, "logistic.pth"),
+    model.load_state_dict(torch.load(os.path.join(DATA_DIR, "mlp.pth"),
                                      map_location=device))
     model.eval()
 
