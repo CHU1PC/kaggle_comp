@@ -7,10 +7,10 @@ class MLP(nn.Module):
         self.net = nn.Sequential(
             nn.Linear(n_in, 32),
             nn.ReLU(),
-            nn.Dropout(0.2),
+            nn.Dropout(0.4),
             nn.Linear(32, 16),
             nn.ReLU(),
-            nn.Dropout(0.2),
+            nn.Dropout(0.4),
             nn.Linear(16, n_out)
         )
 
