@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 
-from preprocess import preprocess
+from all_preprocess import preprocess
 from config import DATA_DIR, FEATURES
 from model import MLP
 
