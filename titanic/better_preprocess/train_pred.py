@@ -42,7 +42,7 @@ def train(device, batch_size=16, n_epoch=20, lr=0.001):
             loss = criterion(output, yb)
             loss.backward()
             optimizer.step()
-        if (epoch+1) % 10 == 0:
+        if (epoch+1) % 100 == 0:
             preds = (torch.sigmoid(output) >= 0.5).int()
             acc = accuracy(preds, yb.int())
             print(f"Epoch {epoch+1}, Loss: {loss.item():.4f}, "
