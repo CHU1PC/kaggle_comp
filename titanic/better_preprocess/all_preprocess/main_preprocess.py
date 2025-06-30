@@ -1,13 +1,15 @@
 import os
+import sys
 import pandas as pd
 
-from config import DATA_DIR, FEATURES
-from age_fillna import pred_ages
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from config import DATA_DIR, FEATURES  # noqa
+from .age_fillna import pred_ages  # noqa
+
+
 pd.set_option('future.no_silent_downcasting', True)
 
 
-# Survived, Pclass, Sex, Age
-# Ageだけfillna
 def preprocess(device, features=FEATURES):
     train_data = pd.read_csv(os.path.join(DATA_DIR, "train.csv"))
     test_data = pd.read_csv(os.path.join(DATA_DIR, "test.csv"))
@@ -42,14 +44,17 @@ def preprocess(device, features=FEATURES):
         map(Honorifics_Dict).astype(float)
 
     # 欠損値補完
-    train_data["Fare"] = train_data["Fare"].fillna(train_data["Fare"].mean())
-    test_data["Fare"] = test_data["Fare"].fillna(test_data["Fare"].mean())
     train_data["Embarked"] = train_data["Embarked"].fillna("S")
     test_data["Embarked"] = test_data["Embarked"].fillna("S")
     train_data["Cabin"] = train_data["Cabin"].fillna("T")
     test_data["Cabin"] = test_data["Cabin"].fillna("T")
     train_data, test_data = pred_ages(train_data, test_data, device)
 
+    # 家族の合計人数
+    train_data["Family_size"] = train_data[["SibSp", "Parch"]].sum(axis=1) + 1
+    test_data["Family_size"] = test_data[["SibSp", "Parch"]].sum(axis=1) + 1
+
+    # 要素の選定
     train_data = train_data[["Survived"] + features]
     test_data = test_data[["PassengerId"] + features]
 
