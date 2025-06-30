@@ -66,13 +66,10 @@ def preprocess(device, features=FEATURES):
         test_data["Embarked"].replace({"S": 0, "C": 1, "Q": 2}).astype(int)
 
     # Cabinの数値化
-    train_data["Cabin"] = \
-        train_data["Cabin"].replace({r"^A.*": 0, r"^B.*": 1, r"^C.*": 2,
-                                     r"^D.*": 3, r"^E.*": 4, r"^F.*": 5,
-                                     r"^G.*": 6, r"^T.*": -1}, regex=True)
-    test_data["Cabin"] = \
-        test_data["Cabin"].replace({r"^A.*": 0, r"^B.*": 1, r"^C.*": 2,
-                                    r"^D.*": 3, r"^E.*": 4, r"^F.*": 5,
-                                    r"^G.*": 6, r"^T.*": -1}, regex=True)
+    for data in [train_data, test_data]:
+        data["Cabin"] = \
+            data["Cabin"].replace({r"^A.*": 0, r"^B.*": 1, r"^C.*": 2,
+                                   r"^D.*": 3, r"^E.*": 4, r"^F.*": 5,
+                                   r"^G.*": 6, r"^T.*": -1}, regex=True)
 
     return train_data, test_data
