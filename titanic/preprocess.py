@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-from config import DATA_DIR
+from config import DATA_DIR, FEATURES
 
 pd.set_option('future.no_silent_downcasting', True)
 
@@ -12,24 +12,31 @@ def preprocess():
     train_data = pd.read_csv(os.path.join(DATA_DIR, "train.csv"))
     test_data = pd.read_csv(os.path.join(DATA_DIR, "test.csv"))
 
-    # 使う特徴量を拡張
-    features = ["Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"]
-    train_data = train_data[["Survived"] + features]
-    test_data = test_data[["PassengerId"] + features]
+    train_data = train_data[["Survived"] + FEATURES]
+    test_data = test_data[["PassengerId"] + FEATURES]
 
     # 欠損値補完
     for col in ["Age", "Fare"]:
         train_data[col] = train_data[col].fillna(train_data[col].mean())
         test_data[col] = test_data[col].fillna(test_data[col].mean())
+    train_data["Embarked"] = train_data["Embarked"].fillna("S")
+    test_data["Embarked"] = test_data["Embarked"].fillna("S")
 
     # Sexの数値化
-    train_data["Sex"] = train_data["Sex"].replace({"male": 0, "female": 1})
-    test_data["Sex"] = test_data["Sex"].replace({"male": 0, "female": 1})
+    train_data["Sex"] = train_data["Sex"].\
+        replace({"male": 0, "female": 1}).astype(int)
+    test_data["Sex"] = test_data["Sex"].\
+        replace({"male": 0, "female": 1}).astype(int)
 
-    # スケーリング（例：標準化）
-    from sklearn.preprocessing import StandardScaler
-    scaler = StandardScaler()
-    train_data[features] = scaler.fit_transform(train_data[features])
-    test_data[features] = scaler.transform(test_data[features])
+    # Embarkedの数値化
+    train_data["Embarked"] = \
+        train_data["Embarked"].replace({"S": 0, "C": 1, "Q": 2}).astype(int)
+    test_data["Embarked"] = \
+        test_data["Embarked"].replace({"S": 0, "C": 1, "Q": 2}).astype(int)
 
     return train_data, test_data
+
+
+# train, test = preprocess()
+
+# print(train.dtypes)

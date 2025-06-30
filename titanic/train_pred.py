@@ -5,15 +5,15 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 
 from preprocess import preprocess
-from config import DATA_DIR
+from config import DATA_DIR, FEATURES
 from model import Logistic
 
 
 def train(device, batch_size=16, n_epoch=20, lr=0.001):
-    train_data, test_data = preprocess()
+    train_data, _ = preprocess()
 
-    features = ["Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"]
-    x_train = torch.tensor(train_data[features].values, dtype=torch.float32)
+    x_train = torch.tensor(train_data.drop("Survived", axis=1).values,
+                           dtype=torch.float32)
 
     y_train = torch.tensor(train_data["Survived"].values,
                            dtype=torch.float32).reshape(-1, 1)
@@ -30,7 +30,7 @@ def train(device, batch_size=16, n_epoch=20, lr=0.001):
     model = Logistic(n_in=x_train.shape[1], n_out=1).to(device)
 
     criterion = nn.BCEWithLogitsLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
     num_epochs = n_epoch
     model.train()
@@ -43,7 +43,10 @@ def train(device, batch_size=16, n_epoch=20, lr=0.001):
             loss.backward()
             optimizer.step()
         if (epoch+1) % 10 == 0:
-            print(f"Epoch {epoch+1}, Loss: {loss.item():.4f}")
+            preds = (torch.sigmoid(output) >= 0.5).int()
+            acc = accuracy(preds, yb.int())
+            print(f"Epoch {epoch+1}, Loss: {loss.item():.4f},"
+                  f"Accuracy: {acc:.4f}")
 
     torch.save(model.state_dict(), os.path.join(DATA_DIR, "logistic.pth"))
 
@@ -51,8 +54,7 @@ def train(device, batch_size=16, n_epoch=20, lr=0.001):
 def predict(model, device):
     _, test_data = preprocess()
 
-    features = ["Pclass", "Sex", "Age", "SibSp", "Parch", "Fare"]
-    x_test = torch.tensor(test_data[features].values,
+    x_test = torch.tensor(test_data[FEATURES].values,
                           dtype=torch.float32).to(device)
 
     model.load_state_dict(torch.load(os.path.join(DATA_DIR, "logistic.pth"),
@@ -64,13 +66,7 @@ def predict(model, device):
         probs = torch.sigmoid(outputs)
         preds = (probs >= 0.5).int().cpu().numpy().flatten()
 
-    if "PassengerId" in test_data.columns:
-        passenger_ids = test_data["PassengerId"].values
-    else:
-        # 必要に応じてIDを生成
-        passenger_ids = range(892, 892 + len(test_data))
-
-    # DataFrame作成
+    passenger_ids = test_data["PassengerId"].values
     submission = pd.DataFrame({
         "PassengerId": passenger_ids,
         "Survived": preds
@@ -78,3 +74,11 @@ def predict(model, device):
     submission.to_csv(os.path.join(DATA_DIR, "submission.csv"), index=False)
     print("submission.csv を出力しました")
     return submission
+
+
+def accuracy(y_pred, y):
+    if isinstance(y, torch.Tensor):
+        y = y.cpu().numpy()
+    if isinstance(y_pred, torch.Tensor):
+        y_pred = y_pred.cpu().numpy()
+    return (y == y_pred).mean()
