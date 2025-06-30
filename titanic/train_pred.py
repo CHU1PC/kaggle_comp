@@ -12,7 +12,8 @@ from model import Logistic
 def train(device, batch_size=16, n_epoch=20, lr=0.001):
     train_data, _ = preprocess()
 
-    x_train = torch.tensor(train_data[FEATURES].values, dtype=torch.float32)
+    x_train = torch.tensor(train_data.drop("Survived", axis=1).values,
+                           dtype=torch.float32)
 
     y_train = torch.tensor(train_data["Survived"].values,
                            dtype=torch.float32).reshape(-1, 1)
@@ -42,7 +43,10 @@ def train(device, batch_size=16, n_epoch=20, lr=0.001):
             loss.backward()
             optimizer.step()
         if (epoch+1) % 10 == 0:
-            print(f"Epoch {epoch+1}, Loss: {loss.item():.4f}")
+            preds = (torch.sigmoid(output) >= 0.5).int()
+            acc = accuracy(preds, yb.int())
+            print(f"Epoch {epoch+1}, Loss: {loss.item():.4f},"
+                  f"Accuracy: {acc:.4f}")
 
     torch.save(model.state_dict(), os.path.join(DATA_DIR, "logistic.pth"))
 
@@ -62,13 +66,7 @@ def predict(model, device):
         probs = torch.sigmoid(outputs)
         preds = (probs >= 0.5).int().cpu().numpy().flatten()
 
-    if "PassengerId" in test_data.columns:
-        passenger_ids = test_data["PassengerId"].values
-    else:
-        # 必要に応じてIDを生成
-        passenger_ids = range(892, 892 + len(test_data))
-
-    # DataFrame作成
+    passenger_ids = test_data["PassengerId"].values
     submission = pd.DataFrame({
         "PassengerId": passenger_ids,
         "Survived": preds
@@ -76,3 +74,11 @@ def predict(model, device):
     submission.to_csv(os.path.join(DATA_DIR, "submission.csv"), index=False)
     print("submission.csv を出力しました")
     return submission
+
+
+def accuracy(y_pred, y):
+    if isinstance(y, torch.Tensor):
+        y = y.cpu().numpy()
+    if isinstance(y_pred, torch.Tensor):
+        y_pred = y_pred.cpu().numpy()
+    return (y == y_pred).mean()
