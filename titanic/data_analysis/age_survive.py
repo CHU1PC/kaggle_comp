@@ -3,7 +3,7 @@ import sys
 import matplotlib.pyplot as plt
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from preprocess import preprocess  # noqa
+from kaggle_comp.titanic.standard.preprocess import preprocess  # noqa
 
 train_data, test_data = preprocess()
 
