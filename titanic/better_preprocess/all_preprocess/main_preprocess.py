@@ -1,7 +1,7 @@
 import os
 import sys
 import pandas as pd
-
+import torch
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from config import DATA_DIR, FEATURES  # noqa
 from .age_fillna import pred_ages  # noqa
@@ -57,6 +57,20 @@ def preprocess(device, features=FEATURES):
     # 要素の選定
     train_data = train_data[["Survived"] + features]
     test_data = test_data[["PassengerId"] + features]
+
+    for col in ["Age", "Fare", "Family_size"]:
+        train_col = torch.tensor(train_data[col].values, dtype=torch.float32)
+        test_col = torch.tensor(test_data[col].values, dtype=torch.float32)
+        mean = train_col.mean()
+        std = train_col.std()
+        train_data[col] = ((train_col - mean) / std).numpy()
+        test_data[col] = ((test_col - mean) / std).numpy()
+
+    # Sexの数値化
+    train_data["Sex"] = \
+        train_data["Sex"].replace({"male": 0, "female": 1}).astype(int)
+    test_data["Sex"] = \
+        test_data["Sex"].replace({"male": 0, "female": 1}).astype(int)
 
     # Sexの数値化
     train_data["Sex"] = train_data["Sex"].\
