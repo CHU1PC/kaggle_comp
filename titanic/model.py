@@ -1,7 +1,7 @@
 import torch.nn as nn
 
 
-class Logistic(nn.Module):
+class MLP(nn.Module):
     def __init__(self, n_in, n_out):
         super().__init__()
         self.net = nn.Sequential(
