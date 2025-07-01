@@ -119,7 +119,8 @@ def main(train_from_one=True):
             dropout1=age_params["dropout1"],
             dropout2=age_params["dropout2"]
         ).to(device)
-        age_model.load_state_dict(age_model_path)
+        age_model.load_state_dict(torch.load(age_model_path,
+                                             map_location=device))
 
         train_data = age_predict(age_model, train_data, device)
 
