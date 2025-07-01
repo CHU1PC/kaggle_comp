@@ -10,7 +10,7 @@ from config import DATA_DIR, FEATURES  # noqa
 pd.set_option('future.no_silent_downcasting', True)
 
 
-def preprocess(device):
+def preprocess():
     train_data = pd.read_csv(os.path.join(DATA_DIR, "train.csv"))
     test_data = pd.read_csv(os.path.join(DATA_DIR, "test.csv"))
     """敬称一覧
