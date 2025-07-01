@@ -53,9 +53,11 @@ def preprocess(device, features=FEATURES):
 
     # 家族の合計人数
     train_data["Family"] = np.where(
-        train_data[["SibSp", "Parch"]].sum(axis=1) >= 1, 1, 0)
+        train_data[["SibSp", "Parch"]].sum(axis=1) >= 1,
+        np.where(train_data[["SibSp", "Parch"]].sum(axis=1) <= 6, 1, 0), 2)
     test_data["Family"] = np.where(
-        test_data[["SibSp", "Parch"]].sum(axis=1) >= 1, 1, 0)
+        test_data[["SibSp", "Parch"]].sum(axis=1) >= 1,
+        np.where(test_data[["SibSp", "Parch"]].sum(axis=1) <= 6, 1, 0), 2)
 
     # 要素の選定
     train_data = train_data[["Survived"] + features]
