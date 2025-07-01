@@ -19,7 +19,7 @@ def main(train_from_one=True):
     model_path = os.path.join(DATA_DIR, "mlp.pth")
     param_path = os.path.join(DATA_DIR, "mlp_hyper_param.json")
 
-    train_data, test_data = preprocess(device=device)
+    train_data, test_data = preprocess()
 
     # 年齢予測用の特徴量数を取得
     age = train_data[["Age", "Pclass", "Sex", "Honorifics", "Family"]].copy()
