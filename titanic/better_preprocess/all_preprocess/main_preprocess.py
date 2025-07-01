@@ -5,16 +5,14 @@ import torch
 import numpy as np
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from config import DATA_DIR, FEATURES  # noqa
-from .age_fillna import pred_ages  # noqa
 
 
 pd.set_option('future.no_silent_downcasting', True)
 
 
-def preprocess(device, features=FEATURES):
+def preprocess():
     train_data = pd.read_csv(os.path.join(DATA_DIR, "train.csv"))
     test_data = pd.read_csv(os.path.join(DATA_DIR, "test.csv"))
-
     """敬称一覧
     Mr：男 , Master：男の子, Jonkheer：オランダ貴族(男),
     Mlle：マドモワゼル (フランス未婚女性), Miss：未婚女性、女の子, Mme：マダム(フランス既婚女性), Ms：女性(未婚・既婚問わず),
@@ -49,19 +47,22 @@ def preprocess(device, features=FEATURES):
     test_data["Embarked"] = test_data["Embarked"].fillna("S")
     train_data["Cabin"] = train_data["Cabin"].fillna("T")
     test_data["Cabin"] = test_data["Cabin"].fillna("T")
-    train_data, test_data = pred_ages(train_data, test_data, device)
 
     # 家族の合計人数
     train_data["Family"] = np.where(
-        train_data[["SibSp", "Parch"]].sum(axis=1) >= 1, 1, 0)
+        train_data[["SibSp", "Parch"]].sum(axis=1) >= 1,
+        np.where(
+            train_data[["SibSp", "Parch"]].sum(axis=1) >= 5, 2, 1), 0)
     test_data["Family"] = np.where(
-        test_data[["SibSp", "Parch"]].sum(axis=1) >= 1, 1, 0)
+        test_data[["SibSp", "Parch"]].sum(axis=1) >= 1,
+        np.where(
+            test_data[["SibSp", "Parch"]].sum(axis=1) >= 5, 2, 1), 0)
 
     # 要素の選定
-    train_data = train_data[["Survived"] + features]
-    test_data = test_data[["PassengerId"] + features]
+    train_data = train_data[["Survived"] + FEATURES]
+    test_data = test_data[["PassengerId"] + FEATURES]
 
-    for col in ["Age", "Fare", "Family"]:
+    for col in ["Fare", "Family"]:
         train_col = torch.tensor(train_data[col].values, dtype=torch.float32)
         test_col = torch.tensor(test_data[col].values, dtype=torch.float32)
         mean = train_col.mean()
