@@ -1,9 +1,9 @@
 import os
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.ensemble import RandomForestRegressor
+# import matplotlib.pyplot as plt
+# import seaborn as sns
+# from sklearn.ensemble import RandomForestRegressor
 from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import SelectKBest
@@ -24,9 +24,10 @@ def main():
     y = train_data.to_numpy()[:, 0].astype(int)  # Survived
     print(np.unique(y, return_counts=True))
 
-    pipe = Pipeline([("classify",
-                      RandomForestClassifier(random_state=10,
-                                             max_features="sqrt"))])
+    pipe = \
+        Pipeline([("select", SelectKBest(k=20)),
+                  ("classify", RandomForestClassifier(random_state=10,
+                                                      max_features="sqrt"))])
 
     param_test = {"classify__n_estimators": list(range(20, 30, 1)),
                   "classify__max_depth": list(range(3, 10, 1))}
@@ -37,13 +38,22 @@ def main():
     gsearch.fit(x, y)
     print(gsearch.best_params_, gsearch.best_score_)
 
-    pred = gsearch.predict(test_data)
+    select = SelectKBest(k=20)
+    clf = RandomForestClassifier(random_state=10, warm_start=True,
+                                 n_estimators=26,
+                                 max_depth=6,
+                                 max_features="sqrt")
+    pipeline = make_pipeline(select, clf)
+    pipeline.fit(x, y)
 
-    submission = pd.DataFrame({
-        "PassengerId": PassengerId["test"].reset_index(drop=True),
-        "Survived": pred.astype(np.int32)})
+    cv_score = model_selection.cross_val_score(pipeline, x, y, cv=10)
+    print("CV Score : Mean - %.7g | Std - %.7g " % (np.mean(cv_score),
+                                                    np.std(cv_score)))
 
-    submission.to_csv(os.path.join(DATA_DIR, "submission3.csv"), index=False)
+    predictions = pipeline.predict(test_data)
+    submission = pd.DataFrame({"PassengerId": PassengerId["test"],
+                               "Survived": predictions.astype(np.int32)})
+    submission.to_csv(os.path.join(DATA_DIR, "submission4.csv"), index=False)
     print("submission.csv を出力しました")
 
 

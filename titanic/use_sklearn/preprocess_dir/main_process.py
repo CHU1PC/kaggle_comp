@@ -85,8 +85,8 @@ def preprocess(get_id=True):
     data["Fare"] = data["Fare"].fillna(fare_median)
 
     # 同乗している家族の数
-    data["FamilySize"] = data["SibSP"] + data["Parch"] + 1
-    data["FamilyLable"] = np.select([data["FamilySize"].isin([2, 3, 4]),
+    data["FamilySize"] = data["SibSp"] + data["Parch"] + 1
+    data["FamilyLabel"] = np.select([data["FamilySize"].isin([2, 3, 4]),
                                      data["FamilySize"].isin([5, 6, 8, 1]),
                                      data["FamilySize"] >= 8],
                                     [0, 1, 2], default=-1)
@@ -100,7 +100,7 @@ def preprocess(get_id=True):
         data.loc[(data["Surname_count"] >= 2) &
                  ((data['Age'] <= 12) | (data['Sex'] == 'female'))]
     Male_Adult_Group = \
-        data.loc[(data['Surname_Count'] >= 2) &
+        data.loc[(data['Surname_count'] >= 2) &
                  (data['Age'] > 12) & (data['Sex'] == 'male')]
 
     # 女・子供グループにおける苗字ごとの生存率平均の個数を比較
@@ -148,7 +148,7 @@ def preprocess(get_id=True):
 
     # 最終的に使う要素
     data = data[['Survived', 'Pclass', 'Sex', 'Age', 'Fare', 'Embarked',
-                 'Honorifics', 'FamilyLabel', 'Deck', 'TicketGroup']]
+                 'Hono', 'FamilyLabel', 'Deck', 'TicketGroup']]
 
     data = pd.get_dummies(data)
     # print(data.shape)
