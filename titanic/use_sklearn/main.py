@@ -24,17 +24,20 @@ def main():
     y = train_data.to_numpy()[:, 0].astype(int)  # Survived
     print(np.unique(y, return_counts=True))
 
-    clf = RandomForestClassifier(random_state=10, max_features="sqrt")
-    pipe = Pipeline([("classify", clf)])
+    pipe = Pipeline([("classify",
+                      RandomForestClassifier(random_state=10,
+                                             max_features="sqrt"))])
+
     param_test = {"classify__n_estimators": list(range(20, 30, 1)),
                   "classify__max_depth": list(range(3, 10, 1))}
 
-    grid = GridSearchCV(estimator=pipe, param_grid=param_test,
-                        scoring='accuracy', cv=10)
-    grid.fit(x, y)
-    print(grid.best_params_, grid.best_score_, sep="\n")
+    gsearch = GridSearchCV(estimator=pipe, param_grid=param_test,
+                           scoring="accuracy", cv=10)
 
-    pred = grid.predict(test_data)
+    gsearch.fit(x, y)
+    print(gsearch.best_params_, gsearch.best_score_)
+
+    pred = gsearch.predict(test_data)
 
     submission = pd.DataFrame({
         "PassengerId": PassengerId["test"].reset_index(drop=True),
