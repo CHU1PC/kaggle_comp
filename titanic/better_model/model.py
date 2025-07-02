@@ -1,20 +1,22 @@
 import lightgbm as lgb
 from lightgbm import early_stopping
 import torch.nn as nn
+import numpy as np
 
 
 # AgeをfillnaするときにMLPをつかう
 class MLP(nn.Module):
-    def __init__(self, n_in, n_out):
+    def __init__(self, n_in, n_out, n_hidden1=32, n_hidden2=32,
+                 dropout1=0.4, dropout2=0.4):
         super().__init__()
         self.net = nn.Sequential(
-            nn.Linear(n_in, 32),
+            nn.Linear(n_in, n_hidden1),
             nn.ReLU(),
-            nn.Dropout(0.4),
-            nn.Linear(32, 16),
+            nn.Dropout(dropout1),
+            nn.Linear(n_hidden1, n_hidden2),
             nn.ReLU(),
-            nn.Dropout(0.4),
-            nn.Linear(16, n_out)
+            nn.Dropout(dropout2),
+            nn.Linear(n_hidden2, n_out)
         )
 
     def forward(self, x):
@@ -38,6 +40,15 @@ class LGBMClassifierWrapper:
 
     def fit(self, X_train, y_train, X_val=None, y_val=None,
             num_boost_round=100, early_stopping_rounds=10):
+        X_train = np.asarray(X_train)
+        y_train = np.asarray(y_train)
+        if X_val is not None and y_val is not None:
+            X_val = np.asarray(X_val)
+            y_val = np.asarray(y_val)
+        # パラメータ型安全性
+        num_boost_round = int(num_boost_round)
+        early_stopping_rounds = int(early_stopping_rounds)
+
         lgb_train = lgb.Dataset(X_train, y_train)
         valid_sets = [lgb_train]
         valid_names = ["train"]
