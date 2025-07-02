@@ -36,10 +36,11 @@ def main():
 
     pred = grid.predict(test_data)
 
-    submission = pd.DataFrame({"PassengerId": PassengerId["test"],
-                               "Survived": pred.astype(np.int32)})
+    submission = pd.DataFrame({
+        "PassengerId": PassengerId["test"].reset_index(drop=True),
+        "Survived": pred.astype(np.int32)})
 
-    submission.to_csv(os.path.join(DATA_DIR, "submission3.csv"))
+    submission.to_csv(os.path.join(DATA_DIR, "submission3.csv"), index=False)
     print("submission.csv を出力しました")
 
 

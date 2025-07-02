@@ -29,7 +29,7 @@ def preprocess(get_id=True):
     # print(data[(data["Deck"].str.startswith("B")) &
     #            (data["Sex"] == "female")]["Embarked"].value_counts())
     # print("=" * 50)
-    data["Embarked"] = data["Embarked"].fillna("C")
+    data["Embarked"] = data["Embarked"].fillna("S")
 
     # na以外のAgeの分布
     age_dist = data["Age"].dropna()
@@ -49,7 +49,7 @@ def preprocess(get_id=True):
                                     [0, 1, 2], default=-1)
 
     data = data[["Survived", "Pclass", "Sex", "Age", "Fare",
-                 "Embarked", "Parch", "SibSp", "Deck", "TicketGroup"]]
+                 "Embarked", "Deck", "TicketGroup"]]
 
     data = pd.get_dummies(data)
     # print(data.shape)
