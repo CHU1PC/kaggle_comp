@@ -24,20 +24,6 @@ def main():
     y = train_data.to_numpy()[:, 0].astype(int)  # Survived
     print(np.unique(y, return_counts=True))
 
-    pipe = \
-        Pipeline([("select", SelectKBest(k=20)),
-                  ("classify", RandomForestClassifier(random_state=10,
-                                                      max_features="sqrt"))])
-
-    param_test = {"classify__n_estimators": list(range(20, 30, 1)),
-                  "classify__max_depth": list(range(3, 10, 1))}
-
-    gsearch = GridSearchCV(estimator=pipe, param_grid=param_test,
-                           scoring="accuracy", cv=10)
-
-    gsearch.fit(x, y)
-    print(gsearch.best_params_, gsearch.best_score_)
-
     select = SelectKBest(k=20)
     clf = RandomForestClassifier(random_state=10, warm_start=True,
                                  n_estimators=26,
