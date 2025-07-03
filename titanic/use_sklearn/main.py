@@ -47,8 +47,8 @@ def main():
     pipeline.fit(x, y)
 
     cv_score = model_selection.cross_val_score(pipeline, x, y, cv=10)
-    print("CV Score : Mean - %.7g | Std - %.7g " % (np.mean(cv_score),
-                                                    np.std(cv_score)))
+    print(f"CV score : Mean - {np.mean(cv_score):.7g} | "
+          f"Std - {np.std(cv_score):.7g}")
 
     predictions = pipeline.predict(test_data)
     submission = pd.DataFrame({"PassengerId": PassengerId["test"],

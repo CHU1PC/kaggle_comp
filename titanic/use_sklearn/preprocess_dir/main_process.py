@@ -95,7 +95,7 @@ def preprocess(get_id=True):
     data["Surname"] = data["Name"].apply(lambda x: x.split(",")[0].strip())
     data["Surname_count"] = data["Surname"].map(data["Surname"].value_counts())
 
-    # 苗字に重複がある人を、女性、子ども、大人かつ男性に分ける
+    # 苗字に重複がある人を、女性または子ども、大人かつ男性に分ける
     Female_Child_Group = \
         data.loc[(data["Surname_count"] >= 2) &
                  ((data['Age'] <= 12) | (data['Sex'] == 'female'))]
@@ -108,22 +108,16 @@ def preprocess(get_id=True):
         Female_Child_Group.groupby('Surname')['Survived'].mean()
     Female_Child_mean_count = pd.DataFrame(Female_Child_mean.value_counts())
     Female_Child_mean_count.columns = ['GroupCount']
-    Female_Child_mean_count
 
     # 男（大人）グループにおける苗字ごとの生存率平均の個数を比較
     Male_Adult_mean = Male_Adult_Group.groupby('Surname')['Survived'].mean()
     Male_Adult_mean_count = pd.DataFrame(Male_Adult_mean.value_counts())
     Male_Adult_mean_count.columns = ['GroupCount']
-    Male_Adult_mean_count
 
     Dead_List = set(Female_Child_mean[
-            Female_Child_mean.apply(lambda x: x == 0)
-        ].index)
-    print("Dead_List", Dead_List, sep="\n")
+            Female_Child_mean.apply(lambda x: x == 0)].index)
     Survived_List = set(Male_Adult_mean[
-            Male_Adult_mean.apply(lambda x: x == 1)
-        ].index)
-    print("Survived_List", Survived_List, sep="\n")
+            Male_Adult_mean.apply(lambda x: x == 1)].index)
 
     train = data.loc[data["Survived"].notna()]
     test = data.loc[data["Survived"].isna()]
