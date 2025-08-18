@@ -3,3 +3,6 @@
 
 # Python 3で生成されるキャッシュディレクトリを無視
 __pycache__/
+
+
+.DS_Store
